@@ -10,7 +10,7 @@ import re
 # PAGE CONFIG
 # -------------------------------
 st.set_page_config(
-    page_title="BMTC Analytics Dashboard",
+    page_title="Bengaluru Metropolitan Transportation Analysis",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -58,9 +58,13 @@ def downsample_df(df: pd.DataFrame, n: int = MAX_MAP_POINTS, seed: int = SAMPLE_
 # -------------------------------
 # LOAD DATA FROM PATHS
 # -------------------------------
-STOPS_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/stops.csv"
-AGGREGATED_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/aggregated.csv"
-ROUTES_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/routes.csv"
+# STOPS_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/stops.csv"
+# AGGREGATED_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/aggregated.csv"
+# ROUTES_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/routes.csv"
+
+AGGREGATED_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/aggregated.csv"
+ROUTES_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/routes.csv"
+STOPS_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/stops.csv"
 
 @st.cache_data
 def load_stops(path):
@@ -87,7 +91,7 @@ routes_df = load_routes(ROUTES_PATH)
 # -------------------------------
 # PAGE TITLE
 # -------------------------------
-st.title("🚍 BMTC Multi-Dataset Analytics Dashboard")
+st.title("🚍 Bengaluru Metropolitan Transportation Analysis")
 st.write("Interactive analytics for bus stops, aggregated summaries, and route geometries.")
 
 # -------------------------------
@@ -97,9 +101,10 @@ tabs = st.tabs([
     "📌 Overview", 
     "📊 Statistics", 
     "📈 Visualizations", 
+    "🚌 Bus Stop Profiles",
     "🗺 Maps", 
-    "🚌 Bus Stop Profiles", 
-    "🛣 Route Explorer"
+     
+    
 ])
 
 # ============================================================
@@ -117,19 +122,129 @@ with tabs[0]:
 # ============================================================
 # TAB 2: STATISTICS
 # ============================================================
+# with tabs[1]:
+#     st.header("📊 Statistical Summary")
+#     st.subheader("Summary Statistics")
+#     st.write(aggregated_df[["trip_count","route_count"]].describe())
+
+#     st.subheader("Variability Metrics")
+#     col1, col2 = st.columns(2)
+#     with col1:
+#         tc = aggregated_df["trip_count"]
+#         st.write("### Trip Count")
+#         st.write(f"Std Dev: {tc.std():.2f}")
+#         st.write(f"MAD: {tc.mad():.2f}")
+#         st.write(f"IQR: {tc.quantile(0.75) - tc.quantile(0.25):.2f}")
+#     with col2:
+#         rc = aggregated_df["route_count"]
+#         st.write("### Route Count")
+#         st.write(f"Std Dev: {rc.std():.2f}")
+#         st.write(f"MAD: {rc.mad():.2f}")
+#         st.write(f"IQR: {rc.quantile(0.75) - rc.quantile(0.25):.2f}")
+
+# with tabs[1]:
+#     st.header("📊 Statistical Summary")
+
+#     # ============================
+#     # Summary Stats
+#     # ============================
+#     st.subheader("Summary Statistics")
+#     st.write(aggregated_df[["trip_count", "route_count"]].describe())
+
+#     # ============================
+#     # Additional Metrics
+#     # ============================
+#     st.subheader("📌 Additional Metrics")
+
+#     colA, colB = st.columns(2)
+
+#     # 🔹 Total Number of Bus Stops
+#     with colA:
+#         total_stops = stops_df.shape[0]
+#         st.metric("Total Number of Bus Stops", total_stops)
+
+#     # 🔹 Top 5 Routes With Most 'route_count'
+#     with colB:
+#         st.write("### Top 5 Routes With Most Routes")
+#         top5_routes = aggregated_df.nlargest(5, "route_count")[["route_name", "route_count"]]
+#         st.dataframe(top5_routes)
+
+#     # ============================
+#     # Variability Metrics
+#     # ============================
+#     st.subheader("Variability Metrics")
+#     col1, col2 = st.columns(2)
+
+#     with col1:
+#         tc = aggregated_df["trip_count"]
+#         st.write("### Trip Count")
+#         st.write(f"Std Dev: {tc.std():.2f}")
+#         st.write(f"MAD: {tc.mad():.2f}")
+#         st.write(f"IQR: {tc.quantile(0.75) - tc.quantile(0.25):.2f}")
+
+#     with col2:
+#         rc = aggregated_df["route_count"]
+#         st.write("### Route Count")
+#         st.write(f"Std Dev: {rc.std():.2f}")
+#         st.write(f"MAD: {rc.mad():.2f}")
+#         st.write(f"IQR: {rc.quantile(0.75) - rc.quantile(0.25):.2f}")
+
+
 with tabs[1]:
     st.header("📊 Statistical Summary")
-    st.subheader("Summary Statistics")
-    st.write(aggregated_df[["trip_count","route_count"]].describe())
 
+    # ============================
+    # Summary Statistics
+    # ============================
+    st.subheader("Summary Statistics")
+    st.write(aggregated_df[["trip_count", "route_count"]].describe())
+
+    # ============================
+    # Additional Metrics
+    # ============================
+    st.subheader("📌 Additional Metrics")
+
+    colA, colB = st.columns(2)
+
+    # 🔹 Total Number of Bus Stops
+    with colA:
+        total_stops = stops_df.shape[0]
+        st.metric("Total Number of Bus Stops", total_stops)
+
+    # 🔹 Top 5 Routes With Highest route_count
+    with colB:
+        st.write("### Top 5 Routes With Most Routes")
+
+        # Auto-detect route-name column
+        possible_cols = ["name", "route_name", "route", "route_no", "route_id"]
+        route_col = None
+        for col in possible_cols:
+            if col in aggregated_df.columns:
+                route_col = col
+                break
+
+        if route_col is None:
+            st.error("No route name column found in aggregated_df")
+        else:
+            top5_routes = aggregated_df.nlargest(5, "route_count")[[route_col, "route_count"]]
+            st.dataframe(top5_routes)
+
+    # ============================
+    # Variability Metrics
+    # ============================
     st.subheader("Variability Metrics")
+
     col1, col2 = st.columns(2)
+
+    # ---- Trip Count Metrics ----
     with col1:
         tc = aggregated_df["trip_count"]
         st.write("### Trip Count")
         st.write(f"Std Dev: {tc.std():.2f}")
         st.write(f"MAD: {tc.mad():.2f}")
         st.write(f"IQR: {tc.quantile(0.75) - tc.quantile(0.25):.2f}")
+
+    # ---- Route Count Metrics ----
     with col2:
         rc = aggregated_df["route_count"]
         st.write("### Route Count")
@@ -170,10 +285,26 @@ with tabs[2]:
     sns.heatmap(filtered_df[["trip_count","route_count"]].corr(), annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
+
+# ============================================================
+# TAB 5: BUS STOP PROFILE
+# ============================================================
+with tabs[3]:
+    st.header("🚌 Bus Stop Profiles")
+    stop_name = st.selectbox("Select a Bus Stop", stops_df["name"].tolist())
+    selected_stop = stops_df[stops_df["name"]==stop_name].iloc[0]
+    st.write(f"**Stop Name:** {selected_stop['name']}")
+    st.write(f"**Trip Count:** {selected_stop['trip_count']}")
+    st.write(f"**Route Count:** {selected_stop['route_count']}")
+    st.map(pd.DataFrame({'lat':[selected_stop['lat']], 'lon':[selected_stop['lon']]}))
+
+
 # ============================================================
 # TAB 4: MAPS
 # ============================================================
-with tabs[3]:
+
+
+with tabs[4]:
     st.header("🗺 Spatial Visualizations")
 
     # Stops Map
@@ -219,52 +350,40 @@ with tabs[3]:
     center_lat = np.mean([c[1] for c in all_coords])
     center_lon = np.mean([c[0] for c in all_coords])
     view = pdk.ViewState(latitude=center_lat, longitude=center_lon, zoom=11, pitch=30)
-    st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/light-v9'))
-
-# ============================================================
-# TAB 5: BUS STOP PROFILE
-# ============================================================
-with tabs[4]:
-    st.header("🚌 Bus Stop Profiles")
-    stop_name = st.selectbox("Select a Bus Stop", stops_df["name"].tolist())
-    selected_stop = stops_df[stops_df["name"]==stop_name].iloc[0]
-    st.write(f"**Stop Name:** {selected_stop['name']}")
-    st.write(f"**Trip Count:** {selected_stop['trip_count']}")
-    st.write(f"**Route Count:** {selected_stop['route_count']}")
-    st.map(pd.DataFrame({'lat':[selected_stop['lat']], 'lon':[selected_stop['lon']]}))
+    st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/dark-v10'))
 
 # ============================================================
 # TAB 6: ROUTE EXPLORER
 # ============================================================
-with tabs[5]:
-    st.header("🛣 Route Explorer")
-    route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
-    route_data = routes_df[routes_df["name"]==route_name].iloc[0]
-    path_coords = [[lon, lat] for lon, lat in route_data["coords"]]
+# with tabs[5]:
+#     st.header("🛣 Route Explorer")
+#     route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
+#     route_data = routes_df[routes_df["name"]==route_name].iloc[0]
+#     path_coords = [[lon, lat] for lon, lat in route_data["coords"]]
 
-    st.write(f"**Route Name:** {route_data['name']}")
-    st.write(f"**Full Name:** {route_data['full_name']}")
-    st.write(f"**Trip Count:** {route_data['trip_count']}")
-    st.write(f"**Stop Count:** {route_data['stop_count']}")
+#     st.write(f"**Route Name:** {route_data['name']}")
+#     st.write(f"**Full Name:** {route_data['full_name']}")
+#     st.write(f"**Trip Count:** {route_data['trip_count']}")
+#     st.write(f"**Stop Count:** {route_data['stop_count']}")
 
-    path_df = pd.DataFrame([{"path": path_coords}])
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style="mapbox://styles/mapbox/light-v9",
-            initial_view_state=pdk.ViewState(
-                latitude=np.mean([lat for lon, lat in path_coords]),
-                longitude=np.mean([lon for lon, lat in path_coords]),
-                zoom=12,
-                pitch=45
-            ),
-            layers=[
-                pdk.Layer(
-                    "PathLayer",
-                    data=path_df,
-                    get_path="path",
-                    get_width=5,
-                    get_color=[0,128,255]
-                )
-            ]
-        )
-    )
+#     path_df = pd.DataFrame([{"path": path_coords}])
+#     st.pydeck_chart(
+#         pdk.Deck(
+#             map_style="mapbox://styles/mapbox/light-v9",
+#             initial_view_state=pdk.ViewState(
+#                 latitude=np.mean([lat for lon, lat in path_coords]),
+#                 longitude=np.mean([lon for lon, lat in path_coords]),
+#                 zoom=12,
+#                 pitch=45
+#             ),
+#             layers=[
+#                 pdk.Layer(
+#                     "PathLayer",
+#                     data=path_df,
+#                     get_path="path",
+#                     get_width=5,
+#                     get_color=[0,128,255]
+#                 )
+#             ]
+#         )
+#     )
