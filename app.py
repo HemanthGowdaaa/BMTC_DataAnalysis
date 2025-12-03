@@ -322,36 +322,96 @@ with tabs[4]:
 
     st.markdown("---")
 
-    # Routes Map
-    st.subheader("Routes Map")
-    # build paths list for pydeck; guard empty coords
-    paths = []
-    for _, row in routes_df.iterrows():
-        coords = row.get('coords', []) or []
-        if not coords:
-            continue
-        # downsample very long routes
-        if len(coords) > 200:
-            idx = np.round(np.linspace(0, len(coords)-1, 200)).astype(int)
-            coords = [coords[i] for i in idx]
-        path_pts = [[float(lon), float(lat)] for lon, lat in coords]
-        # name fallback
-        name = row.get("name") or row.get("route_name") or row.get("id") or ""
-        paths.append({"name": name, "path": path_pts})
+    # # Routes Map
+    # st.subheader("Routes Map")
+    # # build paths list for pydeck; guard empty coords
+    # paths = []
+    # for _, row in routes_df.iterrows():
+    #     coords = row.get('coords', []) or []
+    #     if not coords:
+    #         continue
+    #     # downsample very long routes
+    #     if len(coords) > 200:
+    #         idx = np.round(np.linspace(0, len(coords)-1, 200)).astype(int)
+    #         coords = [coords[i] for i in idx]
+    #     path_pts = [[float(lon), float(lat)] for lon, lat in coords]
+    #     # name fallback
+    #     name = row.get("name") or row.get("route_name") or row.get("id") or ""
+    #     paths.append({"name": name, "path": path_pts})
 
-    if not paths:
-        st.write("No route geometries available to display.")
-    else:
-        layer = pdk.Layer(
-            "PathLayer",
-            data=paths,
-            get_path="path",
-            get_color=[255, 0, 0],
-            get_width=4,
-            pickable=True
-        )
-        all_coords = [pt for p in paths for pt in p["path"]]
-        center_lat = np.mean([c[1] for c in all_coords])
-        center_lon = np.mean([c[0] for c in all_coords])
-        view = pdk.ViewState(latitude=float(center_lat), longitude=float(center_lon), zoom=11, pitch=30)
-        st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/dark-v10'))
+    # if not paths:
+    #     st.write("No route geometries available to display.")
+    # else:
+    #     layer = pdk.Layer(
+    #         "PathLayer",
+    #         data=paths,
+    #         get_path="path",
+    #         get_color=[255, 0, 0],
+    #         get_width=4,
+    #         pickable=True
+    #     )
+    #     all_coords = [pt for p in paths for pt in p["path"]]
+    #     center_lat = np.mean([c[1] for c in all_coords])
+    #     center_lon = np.mean([c[0] for c in all_coords])
+    #     view = pdk.ViewState(latitude=float(center_lat), longitude=float(center_lon), zoom=11, pitch=30)
+    #     st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/dark-v10'))
+
+
+# Routes Map
+st.subheader("Routes Map")
+
+paths = []
+
+for _, row in routes_df.iterrows():
+    coords = row.get("coords", []) or []
+    if not coords:
+        continue
+
+    # downsample long routes
+    if len(coords) > 200:
+        idx = np.round(np.linspace(0, len(coords)-1, 200)).astype(int)
+        coords = [coords[i] for i in idx]
+
+    # ensure valid float values
+    cleaned = []
+    for lon, lat in coords:
+        if not (pd.isna(lon) or pd.isna(lat)):
+            cleaned.append([float(lon), float(lat)])
+
+    if not cleaned:
+        continue
+
+    route_name = row.get("name") or row.get("route_name") or "Route"
+    paths.append({"name": route_name, "path": cleaned})
+
+if not paths:
+    st.write("No route geometries available to display.")
+else:
+    # Flatten to compute center safely
+    all_points = [pt for p in paths for pt in p["path"]]
+
+    center_lon = float(np.mean([pt[0] for pt in all_points]))
+    center_lat = float(np.mean([pt[1] for pt in all_points]))
+
+    layer = pdk.Layer(
+        "PathLayer",
+        paths,
+        get_path="path",
+        get_width=5,
+        get_color=[255, 0, 0],
+        pickable=True
+    )
+
+    view_state = pdk.ViewState(
+        longitude=center_lon,
+        latitude=center_lat,
+        zoom=11,
+        pitch=30
+    )
+
+    st.pydeck_chart(pdk.Deck(
+        layers=[layer],
+        initial_view_state=view_state,
+        map_style="mapbox://styles/mapbox/dark-v10"
+    ))
+
