@@ -59,9 +59,9 @@ def downsample_df(df, n=MAX_MAP_POINTS, seed=SAMPLE_SEED):
 # FILE UPLOAD
 # -------------------------------
 st.sidebar.header("📁 Upload CSV Files")
-stops_file = st.sidebar.file_uploader("Upload stops.csv")
-agg_file = st.sidebar.file_uploader("Upload aggregated.csv")
-routes_file = st.sidebar.file_uploader("Upload routes.csv")
+stops_file = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/stops.csv"
+agg_file = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/aggregated.csv"
+routes_file = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/routes.csv"
 
 if not (stops_file and agg_file and routes_file):
     st.warning("Please upload all three CSV files to continue.")
