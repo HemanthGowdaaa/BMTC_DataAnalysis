@@ -99,9 +99,9 @@ tabs = st.tabs([
     "📌 Overview", 
     "📊 Statistics", 
     "📈 Visualizations", 
-    "🗺 Maps", 
     "🚌 Bus Stop Profiles", 
-    "🛣 Route Explorer"
+    "🛣 Route Explorer",
+    "🗺 Maps"
 ])
 
 # ============================================================
@@ -182,9 +182,74 @@ with tabs[2]:
     st.pyplot(fig)
 
 # ============================================================
-# TAB 4 — MAPS (OPENSTREETMAP)
+# TAB 5 — BUS STOP PROFILE
 # ============================================================
 with tabs[3]:
+    st.header("🚌 Bus Stop Profiles")
+
+    stop_name = st.selectbox("Select a Bus Stop", stops_df["name"].tolist())
+    selected_stop = stops_df[stops_df["name"] == stop_name].iloc[0]
+
+    st.write(f"**Stop Name:** {selected_stop['name']}")
+    st.write(f"**Trip Count:** {selected_stop['trip_count']}")
+    st.write(f"**Route Count:** {selected_stop['route_count']}")
+
+    st.map(pd.DataFrame({"lat": [selected_stop["lat"]], "lon": [selected_stop["lon"]]}))
+
+# ============================================================
+# TAB 6 — ROUTE EXPLORER
+# ============================================================
+with tabs[4]:
+    st.header("🛣 Route Explorer")
+
+    route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
+    route_data = routes_df[routes_df["name"] == route_name].iloc[0]
+
+    coords = route_data["coords"]
+    path_coords = [[lon, lat] for lon, lat in coords]
+
+    st.write(f"### {route_name}")
+
+    if "full_name" in route_data:
+        st.write(f"**Full Name:** {route_data['full_name']}")
+    if "trip_count" in route_data:
+        st.write(f"**Trip Count:** {route_data['trip_count']}")
+    if "stop_count" in route_data:
+        st.write(f"**Stop Count:** {route_data['stop_count']}")
+
+    # MAP
+    path_df = pd.DataFrame([{"path": path_coords, "name": route_name}])
+
+    route_layer = pdk.Layer(
+        "PathLayer",
+        data=path_df,
+        get_path="path",
+        get_width=5,
+        get_color=[0, 128, 255],
+        pickable=True
+    )
+
+    view = pdk.ViewState(
+        latitude=np.mean([lat for lon, lat in path_coords]),
+        longitude=np.mean([lon for lon, lat in path_coords]),
+        zoom=12,
+        pitch=45
+    )
+
+    st.pydeck_chart(pdk.Deck(
+        layers=[osm_layer, route_layer],
+        initial_view_state=view,
+        tooltip={"text": "{name}"}
+    ))
+
+
+
+
+
+# ============================================================
+# TAB 4 — MAPS (OPENSTREETMAP)
+# ============================================================
+with tabs[5]:
     st.header("🗺 Spatial Visualizations (OpenStreetMap)")
 
     osm_layer = pdk.Layer(
@@ -256,71 +321,6 @@ with tabs[3]:
         initial_view_state=view,
         tooltip={"text": "{name}"}
     ))
-
-# ============================================================
-# TAB 5 — BUS STOP PROFILE
-# ============================================================
-with tabs[4]:
-    st.header("🚌 Bus Stop Profiles")
-
-    stop_name = st.selectbox("Select a Bus Stop", stops_df["name"].tolist())
-    selected_stop = stops_df[stops_df["name"] == stop_name].iloc[0]
-
-    st.write(f"**Stop Name:** {selected_stop['name']}")
-    st.write(f"**Trip Count:** {selected_stop['trip_count']}")
-    st.write(f"**Route Count:** {selected_stop['route_count']}")
-
-    st.map(pd.DataFrame({"lat": [selected_stop["lat"]], "lon": [selected_stop["lon"]]}))
-
-# ============================================================
-# TAB 6 — ROUTE EXPLORER
-# ============================================================
-with tabs[5]:
-    st.header("🛣 Route Explorer")
-
-    route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
-    route_data = routes_df[routes_df["name"] == route_name].iloc[0]
-
-    coords = route_data["coords"]
-    path_coords = [[lon, lat] for lon, lat in coords]
-
-    st.write(f"### {route_name}")
-
-    if "full_name" in route_data:
-        st.write(f"**Full Name:** {route_data['full_name']}")
-    if "trip_count" in route_data:
-        st.write(f"**Trip Count:** {route_data['trip_count']}")
-    if "stop_count" in route_data:
-        st.write(f"**Stop Count:** {route_data['stop_count']}")
-
-    # MAP
-    path_df = pd.DataFrame([{"path": path_coords, "name": route_name}])
-
-    route_layer = pdk.Layer(
-        "PathLayer",
-        data=path_df,
-        get_path="path",
-        get_width=5,
-        get_color=[0, 128, 255],
-        pickable=True
-    )
-
-    view = pdk.ViewState(
-        latitude=np.mean([lat for lon, lat in path_coords]),
-        longitude=np.mean([lon for lon, lat in path_coords]),
-        zoom=12,
-        pitch=45
-    )
-
-    st.pydeck_chart(pdk.Deck(
-        layers=[osm_layer, route_layer],
-        initial_view_state=view,
-        tooltip={"text": "{name}"}
-    ))
-
-
-
-
 
 
 
