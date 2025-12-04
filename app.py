@@ -236,35 +236,82 @@ with tabs[4]:
 # ============================================================
 # TAB 6: ROUTE EXPLORER
 # ============================================================
-with tabs[5]:
-    st.header("🛣 Route Explorer")
-    route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
-    route_data = routes_df[routes_df["name"]==route_name].iloc[0]
-    path_coords = [[lon, lat] for lon, lat in route_data["coords"]]
+# with tabs[5]:
+#     st.header("🛣 Route Explorer")
+#     route_name = st.selectbox("Select a Route", routes_df["name"].tolist())
+#     route_data = routes_df[routes_df["name"]==route_name].iloc[0]
+#     path_coords = [[lon, lat] for lon, lat in route_data["coords"]]
 
-    st.write(f"**Route Name:** {route_data['name']}")
-    st.write(f"**Full Name:** {route_data['full_name']}")
-    st.write(f"**Trip Count:** {route_data['trip_count']}")
-    st.write(f"**Stop Count:** {route_data['stop_count']}")
+#     st.write(f"**Route Name:** {route_data['name']}")
+#     st.write(f"**Full Name:** {route_data['full_name']}")
+#     st.write(f"**Trip Count:** {route_data['trip_count']}")
+#     st.write(f"**Stop Count:** {route_data['stop_count']}")
 
-    path_df = pd.DataFrame([{"path": path_coords}])
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style="mapbox://styles/mapbox/light-v9",
-            initial_view_state=pdk.ViewState(
-                latitude=np.mean([lat for lon, lat in path_coords]),
-                longitude=np.mean([lon for lon, lat in path_coords]),
-                zoom=12,
-                pitch=45
-            ),
-            layers=[
-                pdk.Layer(
-                    "PathLayer",
-                    data=path_df,
-                    get_path="path",
-                    get_width=5,
-                    get_color=[0,128,255]
-                )
-            ]
-        )
+#     path_df = pd.DataFrame([{"path": path_coords}])
+#     st.pydeck_chart(
+#         pdk.Deck(
+#             map_style="mapbox://styles/mapbox/light-v9",
+#             initial_view_state=pdk.ViewState(
+#                 latitude=np.mean([lat for lon, lat in path_coords]),
+#                 longitude=np.mean([lon for lon, lat in path_coords]),
+#                 zoom=12,
+#                 pitch=45
+#             ),
+#             layers=[
+#                 pdk.Layer(
+#                     "PathLayer",
+#                     data=path_df,
+#                     get_path="path",
+#                     get_width=5,
+#                     get_color=[0,128,255]
+#                 )
+#             ]
+#         )
+#     )
+with tabs[4]:
+    st.header("🗺 Spatial Visualizations")
+
+    # Stops Map
+    st.subheader("Bus Stops Map")
+    stops_map_df = downsample_df(stops_df[['name','lon','lat','trip_count','route_count']])
+    layer = pdk.Layer(
+        "ScatterplotLayer",
+        data=stops_map_df,
+        get_position='[lon, lat]',
+        get_radius=50,
+        radius_scale=1,
+        get_fill_color='[0, 128, 255, 140]',
+        pickable=True
     )
+    view = pdk.ViewState(
+        latitude=stops_map_df['lat'].mean(),
+        longitude=stops_map_df['lon'].mean(),
+        zoom=11,
+        pitch=30
+    )
+    st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/light-v9'))
+
+    st.markdown("---")
+
+    # Routes Map
+    st.subheader("Routes Map")
+    paths = []
+    for _, row in routes_df.iterrows():
+        coords = row['coords']
+        if len(coords) > 200: # downsample long routes
+            idx = np.round(np.linspace(0, len(coords)-1, 200)).astype(int)
+            coords = [coords[i] for i in idx]
+        paths.append({"name": row["name"], "path": [[lon,lat] for lon,lat in coords]})
+    layer = pdk.Layer(
+        "PathLayer",
+        data=paths,
+        get_path="path",
+        get_color=[255,0,0],
+        get_width=4,
+        pickable=True
+    )
+    all_coords = [pt for p in paths for pt in p["path"]]
+    center_lat = np.mean([c[1] for c in all_coords])
+    center_lon = np.mean([c[0] for c in all_coords])
+    view = pdk.ViewState(latitude=center_lat, longitude=center_lon, zoom=11, pitch=30)
+    st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view, map_style='mapbox://styles/mapbox/dark-v10'))
