@@ -58,9 +58,12 @@ def downsample_df(df: pd.DataFrame, n: int = MAX_MAP_POINTS, seed: int = SAMPLE_
 # -------------------------------
 # LOAD DATA
 # -------------------------------
-STOPS_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/stops.csv"
-AGGREGATED_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/aggregated.csv"
-ROUTES_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/routes.csv"
+# STOPS_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/stops.csv"
+# AGGREGATED_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/aggregated.csv"
+# ROUTES_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/routes.csv"
+AGGREGATED_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/aggregated.csv"
+ROUTES_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/routes.csv"
+STOPS_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/stops.csv"
 
 @st.cache_data
 def load_stops(path):
