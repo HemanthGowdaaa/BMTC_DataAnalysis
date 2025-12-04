@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -55,12 +53,13 @@ def downsample_df(df: pd.DataFrame, n: int = MAX_MAP_POINTS, seed: int = SAMPLE_
         return df
     return df.sample(n=n, random_state=seed).reset_index(drop=True)
 
+# FIX — custom MAD function
+def calc_mad(series):
+    return (series - series.mean()).abs().mean()
+
 # -------------------------------
 # LOAD DATA
 # -------------------------------
-# STOPS_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/stops.csv"
-# AGGREGATED_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/aggregated.csv"
-# ROUTES_PATH = "/Users/hemanth/Desktop/DataSets/routes/backend/analytics/bmtc_dashboard/routes.csv"
 AGGREGATED_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/aggregated.csv"
 ROUTES_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/routes.csv"
 STOPS_PATH = "https://raw.githubusercontent.com/HemanthGowdaaa/BMTC_DataAnalysis/main/stops.csv"
@@ -88,7 +87,7 @@ aggregated_df = load_aggregated(AGGREGATED_PATH)
 routes_df = load_routes(ROUTES_PATH)
 
 # -------------------------------
-# PAGE TITLE
+# TITLE
 # -------------------------------
 st.title("🚍 Bengaluru Metropolitan Transportation Data Analysis")
 st.write("Interactive analytics for bus stops, aggregated summaries, and route geometries.")
@@ -106,7 +105,7 @@ tabs = st.tabs([
 ])
 
 # ============================================================
-# TAB 1: OVERVIEW
+# TAB 1 — OVERVIEW
 # ============================================================
 with tabs[0]:
     st.header("📌 Dataset Overview")
@@ -118,45 +117,53 @@ with tabs[0]:
     st.dataframe(routes_df.head())
 
 # ============================================================
-# TAB 2: STATISTICS
+# TAB 2 — STATISTICS
 # ============================================================
 with tabs[1]:
     st.header("📊 Statistical Summary")
     st.subheader("Summary Statistics")
-    st.write(aggregated_df[["trip_count","route_count"]].describe())
+    st.write(aggregated_df[["trip_count", "route_count"]].describe())
 
     st.subheader("Variability Metrics")
     col1, col2 = st.columns(2)
+
+    # Trip Count
     with col1:
         tc = aggregated_df["trip_count"]
         st.write("### Trip Count")
         st.write(f"Std Dev: {tc.std():.2f}")
-        st.write(f"MAD: {tc.mad():.2f}")
+        st.write(f"MAD: {calc_mad(tc):.2f}")
         st.write(f"IQR: {tc.quantile(0.75) - tc.quantile(0.25):.2f}")
 
+    # Route Count
     with col2:
         rc = aggregated_df["route_count"]
         st.write("### Route Count")
         st.write(f"Std Dev: {rc.std():.2f}")
-        st.write(f"MAD: {rc.mad():.2f}")
+        st.write(f"MAD: {calc_mad(rc):.2f}")
         st.write(f"IQR: {rc.quantile(0.75) - rc.quantile(0.25):.2f}")
 
 # ============================================================
-# TAB 3: VISUALIZATIONS
+# TAB 3 — VISUALIZATIONS
 # ============================================================
 with tabs[2]:
     st.header("📈 Visualizations")
+
     min_trip, max_trip = st.slider(
         "Trip Count Range",
         int(aggregated_df["trip_count"].min()),
         int(aggregated_df["trip_count"].max()),
         (int(aggregated_df["trip_count"].min()), int(aggregated_df["trip_count"].max()))
     )
-    filtered_df = aggregated_df[(aggregated_df["trip_count"]>=min_trip) & (aggregated_df["trip_count"]<=max_trip)]
+
+    filtered_df = aggregated_df[
+        (aggregated_df["trip_count"] >= min_trip) &
+        (aggregated_df["trip_count"] <= max_trip)
+    ]
 
     st.subheader("Boxplot")
     fig, ax = plt.subplots()
-    sns.boxplot(data=filtered_df[["trip_count","route_count"]], ax=ax)
+    sns.boxplot(data=filtered_df[["trip_count", "route_count"]], ax=ax)
     st.pyplot(fig)
 
     st.subheader("Histogram")
@@ -175,14 +182,11 @@ with tabs[2]:
     st.pyplot(fig)
 
 # ============================================================
-# TAB 4: MAPS (OPENSTREETMAP VERSION)
+# TAB 4 — MAPS (OPENSTREETMAP)
 # ============================================================
 with tabs[3]:
     st.header("🗺 Spatial Visualizations (OpenStreetMap)")
 
-    # -------------------------
-    # OSM TileLayer
-    # -------------------------
     osm_layer = pdk.Layer(
         "TileLayer",
         data=None,
@@ -192,9 +196,7 @@ with tabs[3]:
         get_tile_url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
     )
 
-    # -------------------------
-    # Stops Map
-    # -------------------------
+    # ---- Stops Map ----
     st.subheader("Bus Stops Map")
     stops_map_df = downsample_df(stops_df[['name','lon','lat','trip_count','route_count']])
 
@@ -222,16 +224,14 @@ with tabs[3]:
 
     st.markdown("---")
 
-    # -------------------------
-    # Routes Map
-    # -------------------------
+    # ---- Routes Map ----
     st.subheader("Routes Map")
 
     paths = []
     for _, row in routes_df.iterrows():
         coords = row["coords"]
         if len(coords) > 200:
-            idx = np.round(np.linspace(0, len(coords) - 1, 200)).astype(int)
+            idx = np.round(np.linspace(0, len(coords)-1, 200)).astype(int)
             coords = [coords[i] for i in idx]
 
         paths.append({"name": row["name"], "path": [[lon, lat] for lon, lat in coords]})
@@ -258,7 +258,7 @@ with tabs[3]:
     ))
 
 # ============================================================
-# TAB 5: BUS STOP PROFILE
+# TAB 5 — BUS STOP PROFILE
 # ============================================================
 with tabs[4]:
     st.header("🚌 Bus Stop Profiles")
@@ -273,7 +273,7 @@ with tabs[4]:
     st.map(pd.DataFrame({"lat": [selected_stop["lat"]], "lon": [selected_stop["lon"]]}))
 
 # ============================================================
-# TAB 6: ROUTE EXPLORER (OSM VERSION)
+# TAB 6 — ROUTE EXPLORER
 # ============================================================
 with tabs[5]:
     st.header("🛣 Route Explorer")
@@ -284,10 +284,8 @@ with tabs[5]:
     coords = route_data["coords"]
     path_coords = [[lon, lat] for lon, lat in coords]
 
-    # -------------------------
-    # INFO
-    # -------------------------
     st.write(f"### {route_name}")
+
     if "full_name" in route_data:
         st.write(f"**Full Name:** {route_data['full_name']}")
     if "trip_count" in route_data:
@@ -295,9 +293,7 @@ with tabs[5]:
     if "stop_count" in route_data:
         st.write(f"**Stop Count:** {route_data['stop_count']}")
 
-    # -------------------------
-    # MAP RENDER
-    # -------------------------
+    # MAP
     path_df = pd.DataFrame([{"path": path_coords, "name": route_name}])
 
     route_layer = pdk.Layer(
@@ -321,6 +317,17 @@ with tabs[5]:
         initial_view_state=view,
         tooltip={"text": "{name}"}
     ))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
