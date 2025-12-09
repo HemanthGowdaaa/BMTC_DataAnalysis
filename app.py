@@ -244,18 +244,7 @@ with tabs[2]:
     sns.heatmap(corr, annot=True, cmap="viridis", ax=ax)
     st.pyplot(fig)
 
-    # Conclusion
-    st.markdown("""
-    ### 📝 Conclusion (Key Takeaways)
 
-    - **Trip count and route count are positively correlated**, meaning bus stops with more routes tend to have more trips.  
-    - **Trip count distribution is skewed**, showing that a few stops handle very high activity.  
-    - **High variability (Std Dev, MAD, IQR)** shows diverse usage patterns across stops.  
-    - **Hexbin and Contour plots show hotspots**, indicating concentrated transport activity.  
-    - **Violin plot reveals multiple distribution peaks**, suggesting different stop categories.
-
-    Overall, Bengaluru bus operations show **high clustering**, **strong route-trip relationships**, and **several high-traffic hotspots**.
-    """)
 
 # ============================================================
 # TAB 4 — BUS STOP PROFILE
@@ -392,6 +381,18 @@ with tabs[5]:
         initial_view_state=view,
         tooltip={"text": "{name}"}
     ))
+    # Conclusion
+    st.markdown("""
+    ### 📝 Conclusion (Key Takeaways)
+
+    - **Trip count and route count are positively correlated**, meaning bus stops with more routes tend to have more trips.  
+    - **Trip count distribution is skewed**, showing that a few stops handle very high activity.  
+    - **High variability (Std Dev, MAD, IQR)** shows diverse usage patterns across stops.  
+    - **Hexbin and Contour plots show hotspots**, indicating concentrated transport activity.  
+    - **Violin plot reveals multiple distribution peaks**, suggesting different stop categories.
+
+    Overall, Bengaluru bus operations show **high clustering**, **strong route-trip relationships**, and **several high-traffic hotspots**.
+    """)
 
 
 
