@@ -518,7 +518,7 @@ with tabs[2]:
     # BOXPLOT
     # --------------------------------------------------------
     st.subheader("Boxplot")
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.boxplot(data=filtered_df[["trip_count", "route_count"]], ax=ax)
     st.pyplot(fig)
 
@@ -567,7 +567,7 @@ with tabs[2]:
     # SCATTER PLOT (RAW)
     # --------------------------------------------------------
     st.subheader("Scatter Plot (Raw Data)")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.scatterplot(
         data=filtered_df,
         x="route_count",
@@ -580,7 +580,7 @@ with tabs[2]:
     # SCATTER PLOT (NORMALIZED)
     # --------------------------------------------------------
     st.subheader("Scatter Plot (Normalized Data)")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.scatterplot(
         data=normalized_df,
         x="route_count_z",
@@ -595,7 +595,7 @@ with tabs[2]:
     # HEXBIN PLOT
     # --------------------------------------------------------
     st.subheader("Hexagonal Binning Plot")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     hb = ax.hexbin(
         filtered_df["route_count"],
         filtered_df["trip_count"],
@@ -611,7 +611,7 @@ with tabs[2]:
     # CONTOUR PLOT
     # --------------------------------------------------------
     st.subheader("Contour Plot")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.kdeplot(
         x=filtered_df["route_count"],
         y=filtered_df["trip_count"],
@@ -627,7 +627,7 @@ with tabs[2]:
     # VIOLIN PLOT
     # --------------------------------------------------------
     st.subheader("Violin Plot (Trip Count)")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.violinplot(y=filtered_df["trip_count"], ax=ax)
     st.pyplot(fig)
 
@@ -637,7 +637,7 @@ with tabs[2]:
     st.subheader("Correlation Matrix (Raw Data)")
     corr = filtered_df.select_dtypes(include=np.number).corr()
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.heatmap(corr, annot=True, cmap="viridis", ax=ax)
     st.pyplot(fig)
 
