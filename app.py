@@ -927,16 +927,25 @@ with tabs[2]:
     sns.boxplot(data=filtered_df[["trip_count", "route_count"]], ax=ax)
     st.pyplot(fig)
 
+    # # --------------------------------------------------------
+    # # HISTOGRAM WITH CUSTOM BINS
+    # # --------------------------------------------------------
+    # st.subheader("Histogram (Custom Bins to Reduce Outliers)")
+    # bins = [0, 100, 200, 400, 600, 1000, 2000, 5000, 9000]
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
+    # ax.set_xlabel("Trip Count")
+    # ax.set_ylabel("Frequency")
+    # st.pyplot(fig)
     # --------------------------------------------------------
-    # HISTOGRAM WITH CUSTOM BINS
+    # HISTOGRAM
     # --------------------------------------------------------
-    st.subheader("Histogram (Custom Bins to Reduce Outliers)")
-    bins = [0, 100, 200, 400, 600, 1000, 2000, 5000, 9000]
+    st.subheader("Histogram")
     fig, ax = plt.subplots(figsize=(10, 5))
-    sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
+    sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
     ax.set_xlabel("Trip Count")
-    ax.set_ylabel("Frequency")
     st.pyplot(fig)
+
 
     # --------------------------------------------------------
     # DENSITY PLOT
@@ -960,7 +969,7 @@ with tabs[2]:
         "600–1000": (600, 1000),
         "1000–2000": (1000, 2000),
         "2000–5000": (2000, 5000),
-        "5000–9000": (5000, 9000)
+        "5000–9000": (5000, 9416)
     }
 
     # Horizontal radio menu
