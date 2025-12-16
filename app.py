@@ -479,7 +479,6 @@ with tabs[1]:
 #         ax=ax
 #     )
 #     st.pyplot(fig)
-
 with tabs[2]:
     st.header("📈 Visualizations")
 
@@ -538,11 +537,10 @@ with tabs[2]:
     st.pyplot(fig)
 
     # --------------------------------------------------------
-    # LOG TRANSFORMATION (SKEWNESS REDUCTION)
+    # LOG TRANSFORMATION (BEFORE vs AFTER)
     # --------------------------------------------------------
     st.subheader("Log Transformation on Trip Count (Before vs After)")
 
-    # log(1 + x) to handle zero values
     filtered_df["trip_count_log"] = np.log1p(filtered_df["trip_count"])
 
     col1, col2 = st.columns(2)
