@@ -946,28 +946,8 @@ with tabs[2]:
     sns.kdeplot(filtered_df["trip_count"], fill=True, ax=ax)
     ax.set_xlabel("Trip Count")
     st.pyplot(fig)
-
+    
     # --------------------------------------------------------
-    # LOG TRANSFORMATION (BEFORE vs AFTER)
-    # --------------------------------------------------------
-    st.subheader("Log Transformation on Trip Count (Before vs After)")
-    filtered_df["trip_count_log"] = np.log1p(filtered_df["trip_count"])
-
-    col1, col2 = st.columns(2)
-    with col1:
-        st.write("### Before Log Transformation")
-        fig, ax = plt.subplots(figsize=(10, 5))
-        sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
-        ax.set_xlabel("Trip Count")
-        st.pyplot(fig)
-
-    with col2:
-        st.write("### After Log Transformation (log(1 + x))")
-        fig, ax = plt.subplots(figsize=(10, 5))
-        sns.histplot(filtered_df["trip_count_log"], kde=True, ax=ax)
-        ax.set_xlabel("Log Trip Count")
-        st.pyplot(fig)
-        # --------------------------------------------------------
     # DYNAMIC HISTOGRAM WITH RADIO MENU & LOG TRANSFORM
     # --------------------------------------------------------
     st.subheader("Dynamic Histogram with Trip Count Range & Log Transform")
@@ -1018,6 +998,28 @@ with tabs[2]:
     ax.set_title(title)
     st.pyplot(fig)
 
+
+
+    # --------------------------------------------------------
+    # LOG TRANSFORMATION (BEFORE vs AFTER)
+    # --------------------------------------------------------
+    st.subheader("Log Transformation on Trip Count (Before vs After)")
+    filtered_df["trip_count_log"] = np.log1p(filtered_df["trip_count"])
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("### Before Log Transformation")
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
+        ax.set_xlabel("Trip Count")
+        st.pyplot(fig)
+
+    with col2:
+        st.write("### After Log Transformation (log(1 + x))")
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.histplot(filtered_df["trip_count_log"], kde=True, ax=ax)
+        ax.set_xlabel("Log Trip Count")
+        st.pyplot(fig)
 
     # --------------------------------------------------------
     # HEXBIN PLOT (RAW)
