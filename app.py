@@ -120,6 +120,57 @@ with tabs[0]:
 # ============================================================
 # TAB 2 — STATISTICS
 # ============================================================
+# with tabs[1]:
+#     st.header("📊 Statistical Summary")
+    
+#     # Summary Statistics
+#     st.subheader("Summary Statistics")
+#     st.write(aggregated_df[["trip_count", "route_count"]].describe())
+
+#     # Total Bus Stops
+#     st.subheader("📍 Total Bus Stops")
+#     st.metric("Total Bus Stops", len(stops_df))
+
+#     # Top 5 Bus Stops by Routes
+#     st.subheader("🏆 Top 5 Bus Stops With Highest Routes")
+#     top5_routes = stops_df.nlargest(5, "route_count")[["name", "route_count"]]
+#     st.dataframe(top5_routes)
+
+#     # Variability Metrics for each column
+#     st.subheader("📌 Variability Metrics")
+#     col1, col2 = st.columns(2)
+
+#     with col1:
+#         tc = aggregated_df["trip_count"]
+#         st.write("### Trip Count")
+#         st.write(f"Std Dev: {tc.std():.2f}")
+#         st.write(f"MAD: {calc_mad(tc):.2f}")
+#         st.write(f"IQR: {(tc.quantile(0.75) - tc.quantile(0.25)):.2f}")
+
+#     with col2:
+#         rc = aggregated_df["route_count"]
+#         st.write("### Route Count")
+#         st.write(f"Std Dev: {rc.std():.2f}")
+#         st.write(f"MAD: {calc_mad(rc):.2f}")
+#         st.write(f"IQR: {(rc.quantile(0.75) - rc.quantile(0.25)):.2f}")
+
+#     # Generalized Variability Table
+#     st.subheader("📌 Variability Summary (All Numeric Columns)")
+#     num_cols = aggregated_df.select_dtypes(include=np.number).columns
+#     variability = []
+
+#     for col in num_cols:
+#         series = aggregated_df[col]
+#         variability.append({
+#             "Column": col,
+#             "Std Dev": series.std(),
+#             "MAD": calc_mad(series),
+#             "IQR": series.quantile(0.75) - series.quantile(0.25)
+#         })
+
+#     st.dataframe(pd.DataFrame(variability))
+
+
 with tabs[1]:
     st.header("📊 Statistical Summary")
     
@@ -136,13 +187,16 @@ with tabs[1]:
     top5_routes = stops_df.nlargest(5, "route_count")[["name", "route_count"]]
     st.dataframe(top5_routes)
 
-    # Variability Metrics for each column
-    st.subheader("📌 Variability Metrics")
+    # Variability + Central Tendency Metrics
+    st.subheader("📌 Variability & Central Tendency Metrics")
     col1, col2 = st.columns(2)
 
     with col1:
         tc = aggregated_df["trip_count"]
         st.write("### Trip Count")
+        st.write(f"Mean: {tc.mean():.2f}")
+        st.write(f"Median: {tc.median():.2f}")
+        st.write(f"Mode: {tc.mode().iloc[0] if not tc.mode().empty else 'N/A'}")
         st.write(f"Std Dev: {tc.std():.2f}")
         st.write(f"MAD: {calc_mad(tc):.2f}")
         st.write(f"IQR: {(tc.quantile(0.75) - tc.quantile(0.25)):.2f}")
@@ -150,25 +204,33 @@ with tabs[1]:
     with col2:
         rc = aggregated_df["route_count"]
         st.write("### Route Count")
+        st.write(f"Mean: {rc.mean():.2f}")
+        st.write(f"Median: {rc.median():.2f}")
+        st.write(f"Mode: {rc.mode().iloc[0] if not rc.mode().empty else 'N/A'}")
         st.write(f"Std Dev: {rc.std():.2f}")
         st.write(f"MAD: {calc_mad(rc):.2f}")
         st.write(f"IQR: {(rc.quantile(0.75) - rc.quantile(0.25)):.2f}")
 
-    # Generalized Variability Table
-    st.subheader("📌 Variability Summary (All Numeric Columns)")
+    # Generalized Summary Table
+    st.subheader("📌 Statistical Summary (All Numeric Columns)")
     num_cols = aggregated_df.select_dtypes(include=np.number).columns
-    variability = []
+    stats = []
 
     for col in num_cols:
         series = aggregated_df[col]
-        variability.append({
+        stats.append({
             "Column": col,
+            "Mean": series.mean(),
+            "Median": series.median(),
+            "Mode": series.mode().iloc[0] if not series.mode().empty else np.nan,
             "Std Dev": series.std(),
             "MAD": calc_mad(series),
             "IQR": series.quantile(0.75) - series.quantile(0.25)
         })
 
-    st.dataframe(pd.DataFrame(variability))
+    st.dataframe(pd.DataFrame(stats))
+
+
 
 # ============================================================
 # TAB 3 — VISUALIZATIONS
