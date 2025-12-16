@@ -1019,7 +1019,7 @@ with tabs[2]:
     with col1:
         st.write("### Before Log Transformation")
         fig, ax = plt.subplots(figsize=(10, 5))
-        sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
+        sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
         ax.set_xlabel("Trip Count")
         st.pyplot(fig)
 
