@@ -668,8 +668,6 @@ with tabs[1]:
 #     st.pyplot(fig)
 
 
-
-
 with tabs[2]:
     st.header("📈 Visualizations")
 
@@ -695,7 +693,6 @@ with tabs[2]:
     # NORMALIZATION (Z-SCORE)
     # --------------------------------------------------------
     normalized_df = filtered_df.copy()
-
     for col in ["trip_count", "route_count"]:
         normalized_df[col + "_z"] = (
             normalized_df[col] - normalized_df[col].mean()
@@ -710,12 +707,14 @@ with tabs[2]:
     st.pyplot(fig)
 
     # --------------------------------------------------------
-    # HISTOGRAM
+    # HISTOGRAM WITH CUSTOM BINS
     # --------------------------------------------------------
-    st.subheader("Histogram")
+    st.subheader("Histogram (Custom Bins to Reduce Outliers)")
+    bins = [0, 100, 200, 400, 600, 1000, 2000, 5000, 9000]
     fig, ax = plt.subplots(figsize=(10, 5))
-    sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
+    sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
     ax.set_xlabel("Trip Count")
+    ax.set_ylabel("Frequency")
     st.pyplot(fig)
 
     # --------------------------------------------------------
@@ -731,21 +730,19 @@ with tabs[2]:
     # LOG TRANSFORMATION (BEFORE vs AFTER)
     # --------------------------------------------------------
     st.subheader("Log Transformation on Trip Count (Before vs After)")
-
     filtered_df["trip_count_log"] = np.log1p(filtered_df["trip_count"])
 
     col1, col2 = st.columns(2)
-
     with col1:
         st.write("### Before Log Transformation")
-        fig, ax = plt.subplots()
-        sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.histplot(filtered_df["trip_count"], bins=bins, kde=True, ax=ax)
         ax.set_xlabel("Trip Count")
         st.pyplot(fig)
 
     with col2:
         st.write("### After Log Transformation (log(1 + x))")
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10, 5))
         sns.histplot(filtered_df["trip_count_log"], kde=True, ax=ax)
         ax.set_xlabel("Log Trip Count")
         st.pyplot(fig)
@@ -889,6 +886,7 @@ with tabs[2]:
         f"Spearman ρ = {spearman_corr:.4f}, p-value = {spearman_p:.4e}"
     )
     st.pyplot(fig)
+
 
 
 
