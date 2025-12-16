@@ -479,6 +479,10 @@ with tabs[1]:
 #         ax=ax
 #     )
 #     st.pyplot(fig)
+
+
+
+
 with tabs[2]:
     st.header("📈 Visualizations")
 
@@ -514,7 +518,7 @@ with tabs[2]:
     # BOXPLOT
     # --------------------------------------------------------
     st.subheader("Boxplot")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(6, 4))
     sns.boxplot(data=filtered_df[["trip_count", "route_count"]], ax=ax)
     st.pyplot(fig)
 
@@ -522,7 +526,7 @@ with tabs[2]:
     # HISTOGRAM
     # --------------------------------------------------------
     st.subheader("Histogram")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 5))
     sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
     ax.set_xlabel("Trip Count")
     st.pyplot(fig)
@@ -531,7 +535,7 @@ with tabs[2]:
     # DENSITY PLOT
     # --------------------------------------------------------
     st.subheader("Density Plot")
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8, 4))
     sns.kdeplot(filtered_df["trip_count"], fill=True, ax=ax)
     ax.set_xlabel("Trip Count")
     st.pyplot(fig)
