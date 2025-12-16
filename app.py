@@ -483,6 +483,193 @@ with tabs[1]:
 
 
 
+# with tabs[2]:
+#     st.header("📈 Visualizations")
+
+#     # --------------------------------------------------------
+#     # FILTER USING SLIDER
+#     # --------------------------------------------------------
+#     min_trip, max_trip = st.slider(
+#         "Trip Count Range",
+#         int(aggregated_df["trip_count"].min()),
+#         int(aggregated_df["trip_count"].max()),
+#         (
+#             int(aggregated_df["trip_count"].min()),
+#             int(aggregated_df["trip_count"].max())
+#         )
+#     )
+
+#     filtered_df = aggregated_df[
+#         (aggregated_df["trip_count"] >= min_trip) &
+#         (aggregated_df["trip_count"] <= max_trip)
+#     ].copy()
+
+#     # --------------------------------------------------------
+#     # NORMALIZATION (Z-SCORE)
+#     # --------------------------------------------------------
+#     normalized_df = filtered_df.copy()
+
+#     for col in ["trip_count", "route_count"]:
+#         normalized_df[col + "_z"] = (
+#             normalized_df[col] - normalized_df[col].mean()
+#         ) / normalized_df[col].std()
+
+#     # --------------------------------------------------------
+#     # BOXPLOT
+#     # --------------------------------------------------------
+#     st.subheader("Boxplot")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.boxplot(data=filtered_df[["trip_count", "route_count"]], ax=ax)
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # HISTOGRAM
+#     # --------------------------------------------------------
+#     st.subheader("Histogram")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
+#     ax.set_xlabel("Trip Count")
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # DENSITY PLOT
+#     # --------------------------------------------------------
+#     st.subheader("Density Plot")
+#     fig, ax = plt.subplots(figsize=(8, 4))
+#     sns.kdeplot(filtered_df["trip_count"], fill=True, ax=ax)
+#     ax.set_xlabel("Trip Count")
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # LOG TRANSFORMATION (BEFORE vs AFTER)
+#     # --------------------------------------------------------
+#     st.subheader("Log Transformation on Trip Count (Before vs After)")
+
+#     filtered_df["trip_count_log"] = np.log1p(filtered_df["trip_count"])
+
+#     col1, col2 = st.columns(2)
+
+#     with col1:
+#         st.write("### Before Log Transformation")
+#         fig, ax = plt.subplots()
+#         sns.histplot(filtered_df["trip_count"], kde=True, ax=ax)
+#         ax.set_xlabel("Trip Count")
+#         st.pyplot(fig)
+
+#     with col2:
+#         st.write("### After Log Transformation (log(1 + x))")
+#         fig, ax = plt.subplots()
+#         sns.histplot(filtered_df["trip_count_log"], kde=True, ax=ax)
+#         ax.set_xlabel("Log Trip Count")
+#         st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # SCATTER PLOT (RAW)
+#     # --------------------------------------------------------
+#     st.subheader("Scatter Plot (Raw Data)")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.scatterplot(
+#         data=filtered_df,
+#         x="route_count",
+#         y="trip_count",
+#         ax=ax
+#     )
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # SCATTER PLOT (NORMALIZED)
+#     # --------------------------------------------------------
+#     st.subheader("Scatter Plot (Normalized Data)")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.scatterplot(
+#         data=normalized_df,
+#         x="route_count_z",
+#         y="trip_count_z",
+#         ax=ax
+#     )
+#     ax.set_xlabel("Route Count (Z-score)")
+#     ax.set_ylabel("Trip Count (Z-score)")
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # HEXBIN PLOT
+#     # --------------------------------------------------------
+#     st.subheader("Hexagonal Binning Plot")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     hb = ax.hexbin(
+#         filtered_df["route_count"],
+#         filtered_df["trip_count"],
+#         gridsize=30,
+#         cmap="inferno"
+#     )
+#     plt.colorbar(hb, ax=ax)
+#     ax.set_xlabel("Route Count")
+#     ax.set_ylabel("Trip Count")
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # CONTOUR PLOT
+#     # --------------------------------------------------------
+#     st.subheader("Contour Plot")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.kdeplot(
+#         x=filtered_df["route_count"],
+#         y=filtered_df["trip_count"],
+#         cmap="coolwarm",
+#         levels=10,
+#         ax=ax
+#     )
+#     ax.set_xlabel("Route Count")
+#     ax.set_ylabel("Trip Count")
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # VIOLIN PLOT
+#     # --------------------------------------------------------
+#     st.subheader("Violin Plot (Trip Count)")
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.violinplot(y=filtered_df["trip_count"], ax=ax)
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # CORRELATION MATRIX (RAW DATA)
+#     # --------------------------------------------------------
+#     st.subheader("Correlation Matrix (Raw Data)")
+#     corr = filtered_df.select_dtypes(include=np.number).corr()
+
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     sns.heatmap(corr, annot=True, cmap="viridis", ax=ax)
+#     st.pyplot(fig)
+
+#     # --------------------------------------------------------
+#     # PEARSON CORRELATION
+#     # --------------------------------------------------------
+#     st.subheader("Pearson Correlation")
+
+#     pearson_corr = normalized_df["trip_count_z"].corr(
+#         normalized_df["route_count_z"],
+#         method="pearson"
+#     )
+
+#     st.write(
+#         f"**Pearson Correlation between Trip Count and Route Count:** `{pearson_corr:.4f}`"
+#     )
+
+#     # --------------------------------------------------------
+#     # CORRELATION MATRIX (NORMALIZED DATA)
+#     # --------------------------------------------------------
+#     st.subheader("Correlation Matrix (Normalized Data)")
+#     norm_corr = normalized_df[
+#         ["trip_count_z", "route_count_z"]
+#     ].corr()
+
+#     fig, ax = plt.subplots(figsize=(5, 3))
+#     sns.heatmap(norm_corr, annot=True, cmap="coolwarm", ax=ax)
+#     st.pyplot(fig)
+
+
+
+
 with tabs[2]:
     st.header("📈 Visualizations")
 
@@ -564,6 +751,22 @@ with tabs[2]:
         st.pyplot(fig)
 
     # --------------------------------------------------------
+    # HEXBIN PLOT (LOG-TRANSFORMED TRIP COUNT)
+    # --------------------------------------------------------
+    st.subheader("Hexagonal Binning Plot (Log-Transformed Trip Count)")
+    fig, ax = plt.subplots(figsize=(10, 5))
+    hb = ax.hexbin(
+        filtered_df["route_count"],
+        filtered_df["trip_count_log"],
+        gridsize=30,
+        cmap="magma"
+    )
+    plt.colorbar(hb, ax=ax)
+    ax.set_xlabel("Route Count")
+    ax.set_ylabel("Log Trip Count")
+    st.pyplot(fig)
+
+    # --------------------------------------------------------
     # SCATTER PLOT (RAW)
     # --------------------------------------------------------
     st.subheader("Scatter Plot (Raw Data)")
@@ -592,7 +795,7 @@ with tabs[2]:
     st.pyplot(fig)
 
     # --------------------------------------------------------
-    # HEXBIN PLOT
+    # HEXBIN PLOT (RAW)
     # --------------------------------------------------------
     st.subheader("Hexagonal Binning Plot")
     fig, ax = plt.subplots(figsize=(10, 5))
@@ -636,23 +839,22 @@ with tabs[2]:
     # --------------------------------------------------------
     st.subheader("Correlation Matrix (Raw Data)")
     corr = filtered_df.select_dtypes(include=np.number).corr()
-
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.heatmap(corr, annot=True, cmap="viridis", ax=ax)
     st.pyplot(fig)
 
     # --------------------------------------------------------
-    # PEARSON CORRELATION
+    # PEARSON CORRELATION WITH P-VALUE
     # --------------------------------------------------------
     st.subheader("Pearson Correlation")
-
-    pearson_corr = normalized_df["trip_count_z"].corr(
-        normalized_df["route_count_z"],
-        method="pearson"
+    from scipy.stats import pearsonr
+    pearson_r, pearson_p = pearsonr(
+        normalized_df["trip_count_z"],
+        normalized_df["route_count_z"]
     )
-
     st.write(
-        f"**Pearson Correlation between Trip Count and Route Count:** `{pearson_corr:.4f}`"
+        f"**Pearson Correlation:** `{pearson_r:.4f}`  \n"
+        f"**p-value:** `{pearson_p:.4e}`"
     )
 
     # --------------------------------------------------------
@@ -662,12 +864,31 @@ with tabs[2]:
     norm_corr = normalized_df[
         ["trip_count_z", "route_count_z"]
     ].corr()
-
     fig, ax = plt.subplots(figsize=(5, 3))
     sns.heatmap(norm_corr, annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
-
+    # --------------------------------------------------------
+    # SPEARMAN CORRELATION PLOT
+    # --------------------------------------------------------
+    st.subheader("Spearman Correlation (Rank-Based)")
+    from scipy.stats import spearmanr
+    spearman_corr, spearman_p = spearmanr(
+        filtered_df["route_count"],
+        filtered_df["trip_count"]
+    )
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.scatterplot(
+        x=filtered_df["route_count"].rank(),
+        y=filtered_df["trip_count"].rank(),
+        ax=ax
+    )
+    ax.set_xlabel("Route Count (Rank)")
+    ax.set_ylabel("Trip Count (Rank)")
+    ax.set_title(
+        f"Spearman ρ = {spearman_corr:.4f}, p-value = {spearman_p:.4e}"
+    )
+    st.pyplot(fig)
 
 
 
